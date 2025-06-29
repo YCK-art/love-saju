@@ -79,6 +79,9 @@ body {
   padding: 1.5rem;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   margin-bottom: 1.5rem;
+  max-width: 430px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .card-header {
@@ -110,13 +113,17 @@ body {
 
 .form-input, .form-select {
   width: 100%;
-  max-width: 400px;
+  max-width: 360px;
+  min-width: 180px;
   padding: 0.75rem 1rem;
   border: 1px solid #d1d5db;
   border-radius: 0.75rem;
   font-size: 1rem;
   transition: all 0.3s ease;
   box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
 .form-input:focus {
@@ -427,8 +434,9 @@ body {
 
 @media (max-width: 600px) {
   .card {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+    max-width: 98vw;
   }
   .form-input, .form-select {
     max-width: 100%;
