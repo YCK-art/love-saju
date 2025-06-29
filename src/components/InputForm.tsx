@@ -3,20 +3,22 @@ import { PersonInfo } from '../App';
 
 interface InputFormProps {
   onStartReading: (user: PersonInfo, crush: PersonInfo) => void;
+  authUser?: { uid: string } | null;
 }
 
-const InputForm: React.FC<InputFormProps> = ({ onStartReading }) => {
+const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser }) => {
   // 2000년을 기본값으로 설정
   const defaultDate = '2000-01-01';
   const LOCAL_KEY = 'my_profile';
   
-  const [userInfo, setUserInfo] = useState<PersonInfo>({
+  const defaultUserInfo: PersonInfo = {
     name: '',
     gender: '여자',
     birthDate: defaultDate,
     birthTime: ''
-  });
+  };
 
+  const [userInfo, setUserInfo] = useState<PersonInfo>(defaultUserInfo);
   const [crushInfo, setCrushInfo] = useState<PersonInfo>({
     name: '',
     gender: '남자',
@@ -24,9 +26,10 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading }) => {
     birthTime: ''
   });
 
-  // 내 정보 자동 입력 (localStorage)
+  // 내 정보 자동 입력 (계정별 localStorage)
   useEffect(() => {
-    const saved = localStorage.getItem(LOCAL_KEY);
+    const profileKey = authUser?.uid ? `${LOCAL_KEY}_${authUser.uid}` : LOCAL_KEY;
+    const saved = localStorage.getItem(profileKey);
     if (saved) {
       const profile = JSON.parse(saved);
       setUserInfo({
@@ -35,8 +38,18 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading }) => {
         birthDate: profile.birthDate || defaultDate,
         birthTime: profile.birthTime || ''
       });
+    } else {
+      // 계정별 설정이 없으면 기본값으로 초기화
+      setUserInfo(defaultUserInfo);
     }
-  }, []);
+  }, [authUser?.uid]);
+
+  // 로그아웃 시 내 정보 입력란 초기화
+  useEffect(() => {
+    if (!authUser) {
+      setUserInfo(defaultUserInfo);
+    }
+  }, [authUser]);
 
   // 내 정보 성별에 따라 상대방 성별 자동 설정
   useEffect(() => {

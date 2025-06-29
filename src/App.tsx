@@ -8,6 +8,13 @@ import Header from './components/Header';
 import { calculateSaju, analyzeCompatibility, CompatibilityAnalysis } from './utils/sajuCalculator';
 import { HistoryManager, HistoryEntry } from './utils/historyManager';
 import { AuthUser, onAuthStateChange } from './utils/authManager';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useParams,
+  Navigate
+} from 'react-router-dom';
 
 export interface PersonInfo {
   name: string;
@@ -22,6 +29,24 @@ export interface SajuResult {
   compatibility: number;
 }
 
+// 공유 결과지 전용 컴포넌트
+function SharedResult() {
+  const { id } = useParams<{ id: string }>();
+  // uid 없이 전체 히스토리에서 찾음 (비로그인 공유)
+  const entry = HistoryManager.getHistory().find(e => e.id === id);
+  if (!entry) return <div style={{textAlign:'center',marginTop:'4rem',color:'#bdbdbd'}}>존재하지 않는 결과지입니다.</div>;
+  return (
+    <Result
+      result={entry.result}
+      userInfo={entry.userInfo}
+      crushInfo={entry.crushInfo}
+      analysis={entry.analysis}
+      onRestart={() => window.location.href = '/'}
+      entryId={entry.id}
+    />
+  );
+}
+
 function App() {
   const [showStart, setShowStart] = useState(true); // 첫 화면 제어
   const [currentStep, setCurrentStep] = useState<'input' | 'loading' | 'result'>('input');
@@ -33,6 +58,7 @@ function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [historyKey, setHistoryKey] = useState(0); // 히스토리 강제 리렌더링용
   const [authUser, setAuthUser] = useState<AuthUser | null>(null); // 인증된 사용자
+  const [currentResultId, setCurrentResultId] = useState<string | null>(null);
 
   // 인증 상태 감지
   useEffect(() => {
@@ -83,9 +109,7 @@ function App() {
     setCrushInfo(crush);
     setCurrentStep('loading');
 
-    // 2-3초 후 결과 페이지로 이동
     setTimeout(() => {
-      // 실제 사주 계산
       const userSaju = calculateSaju(user.birthDate, user.birthTime);
       const crushSaju = calculateSaju(crush.birthDate, crush.birthTime);
       const compatibilityAnalysis = analyzeCompatibility(userSaju, crushSaju);
@@ -102,8 +126,13 @@ function App() {
 
       // 히스토리에 저장 (uid)
       HistoryManager.saveToHistory(user, crush, newResult, compatibilityAnalysis, authUser?.uid);
-      
-      // 히스토리 사이드바 강제 새로고침
+      // 방금 저장한 히스토리의 id 추적
+      const history = HistoryManager.getHistory(authUser?.uid);
+      if (history && history.length > 0) {
+        setCurrentResultId(history[0].id);
+      } else {
+        setCurrentResultId(null);
+      }
       setHistoryKey(prev => prev + 1);
     }, 2500);
   };
@@ -128,67 +157,45 @@ function App() {
   };
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      background: 'linear-gradient(135deg, #ffe5f1 0%, #f3e5f5 50%, #e9d5ff 100%)',
-      fontFamily: 'Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", Arial, sans-serif'
-    }}>
-      {/* Header (로그인/회원가입 버튼) */}
-      <Header user={authUser} onUserChange={setAuthUser} />
-
-      {/* 인트로 화면 */}
-      {showStart && <StartScreen onStart={handleCloseIntro} />}
-
-      {/* 히스토리 사이드바 */}
-      <HistorySidebar
-        key={historyKey} // 강제 리렌더링을 위한 key
-        isOpen={isHistoryOpen}
-        onToggle={() => setIsHistoryOpen(!isHistoryOpen)}
-        onLoadHistory={handleLoadHistory}
-        uid={authUser?.uid}
-      />
-
-      {/* 메인 콘텐츠 */}
-      <div style={{
-        marginLeft: isMobile ? 0 : '320px',
-        padding: '2rem 1rem',
-        paddingTop: '5rem', // Header 높이만큼 여백 추가
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        opacity: showStart ? 0.4 : 1,
-        pointerEvents: showStart ? 'none' : 'auto',
-        transition: 'opacity 0.4s',
+    <Router>
+      <div style={{ 
+        minHeight: '100vh', 
+        background: 'linear-gradient(135deg, #ffe5f1 0%, #f3e5f5 50%, #e9d5ff 100%)',
+        fontFamily: 'Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", Arial, sans-serif'
       }}>
-        <div style={{ 
-          width: '100%', 
-          maxWidth: '500px',
-          background: 'rgba(255,255,255,0.8)',
-          borderRadius: '2rem',
-          boxShadow: '0 8px 32px rgba(236,72,153,0.1)',
-          backdropFilter: 'blur(10px)',
-          padding: '2rem 1.5rem',
-        }}>
-          {currentStep === 'input' && (
-            <InputForm onStartReading={handleStartReading} />
-          )}
-          {currentStep === 'loading' && (
-            <Loading />
-          )}
-          {currentStep === 'result' && result && analysis && userInfo && crushInfo && (
-            <Result 
-              result={result} 
-              userInfo={userInfo} 
-              crushInfo={crushInfo}
-              analysis={analysis}
-              onRestart={handleRestart} 
-            />
-          )}
-        </div>
+        <Header user={authUser} onUserChange={setAuthUser} />
+        {showStart && <StartScreen onStart={handleCloseIntro} />}
+        <HistorySidebar
+          key={historyKey}
+          isOpen={isHistoryOpen}
+          onToggle={() => setIsHistoryOpen(!isHistoryOpen)}
+          onLoadHistory={handleLoadHistory}
+          uid={authUser?.uid}
+        />
+        <main style={{ marginLeft: isMobile ? 0 : 320, transition: 'margin 0.3s', minHeight: '100vh' }}>
+          <Routes>
+            <Route path="/share/:id" element={<SharedResult />} />
+            <Route path="/*" element={
+              <>
+                {currentStep === 'input' && <InputForm onStartReading={handleStartReading} authUser={authUser} />}
+                {currentStep === 'loading' && <Loading />}
+                {currentStep === 'result' && result && analysis && userInfo && crushInfo && (
+                  <Result 
+                    result={result} 
+                    userInfo={userInfo} 
+                    crushInfo={crushInfo}
+                    analysis={analysis}
+                    onRestart={handleRestart}
+                    entryId={currentResultId}
+                    uid={authUser?.uid}
+                  />
+                )}
+              </>
+            } />
+          </Routes>
+        </main>
       </div>
-    </div>
+    </Router>
   );
 }
 

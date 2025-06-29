@@ -17,7 +17,7 @@ interface MyProfile {
 const defaultProfile: MyProfile = {
   name: '',
   gender: '남자',
-  birthDate: '',
+  birthDate: '2000-01-01',
   birthTime: ''
 };
 
@@ -34,11 +34,16 @@ const Header: React.FC<HeaderProps> = ({ user, onUserChange }) => {
   // 모바일 감지
   const isMobile = window.innerWidth < 700;
 
-  // 내 정보 불러오기
+  // 내 정보 불러오기 (계정별)
   useEffect(() => {
-    const saved = localStorage.getItem(LOCAL_KEY);
-    if (saved) setProfile(JSON.parse(saved));
-  }, []);
+    const profileKey = user?.uid ? `${LOCAL_KEY}_${user.uid}` : LOCAL_KEY;
+    const saved = localStorage.getItem(profileKey);
+    if (saved) {
+      setProfile(JSON.parse(saved));
+    } else {
+      setProfile(defaultProfile);
+    }
+  }, [user?.uid]);
 
   // 바깥 클릭 시 드롭다운 닫기
   useEffect(() => {
@@ -108,9 +113,9 @@ const Header: React.FC<HeaderProps> = ({ user, onUserChange }) => {
 
   // 내 정보 저장
   const handleProfileSave = () => {
-    localStorage.setItem(LOCAL_KEY, JSON.stringify(profile));
+    const profileKey = user?.uid ? `${LOCAL_KEY}_${user.uid}` : LOCAL_KEY;
+    localStorage.setItem(profileKey, JSON.stringify(profile));
     setShowProfileModal(false);
-    alert('내 정보가 저장되었습니다!');
   };
 
   return (
@@ -267,7 +272,7 @@ const Header: React.FC<HeaderProps> = ({ user, onUserChange }) => {
                   </div>
                   <div>
                     <label style={{ fontWeight: 600, color: '#8b5cf6', fontSize: '0.97rem' }}>생년월일</label>
-                    <input type="date" value={profile.birthDate} onChange={e => setProfile(p => ({ ...p, birthDate: e.target.value }))} style={{ width: '100%', padding: '0.7rem 1rem', borderRadius: '0.7rem', border: '1px solid #e5e7eb', marginTop: '0.3rem' }} />
+                    <input type="date" value={profile.birthDate || '2000-01-01'} onChange={e => setProfile(p => ({ ...p, birthDate: e.target.value }))} style={{ width: '100%', padding: '0.7rem 1rem', borderRadius: '0.7rem', border: '1px solid #e5e7eb', marginTop: '0.3rem' }} />
                   </div>
                   <div>
                     <label style={{ fontWeight: 600, color: '#8b5cf6', fontSize: '0.97rem' }}>태어난 시간 (선택)</label>

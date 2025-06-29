@@ -8,9 +8,11 @@ interface ResultProps {
   crushInfo: PersonInfo;
   analysis: CompatibilityAnalysis;
   onRestart: () => void;
+  entryId?: string | null;
+  uid?: string;
 }
 
-const Result: React.FC<ResultProps> = ({ result, userInfo, crushInfo, analysis, onRestart }) => {
+const Result: React.FC<ResultProps> = ({ result, userInfo, crushInfo, analysis, onRestart, entryId, uid }) => {
   // 점수에 따라 컬러 결정
   const getScoreColor = (score: number) => {
     if (score >= 85) return '#ec4899'; // 진한 핑크
@@ -22,7 +24,21 @@ const Result: React.FC<ResultProps> = ({ result, userInfo, crushInfo, analysis, 
   const [copied, setCopied] = useState(false);
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      let shareUrl = window.location.href;
+      if (entryId) {
+        // 공유 링크 생성
+        const entry = (window as any).HistoryManager?.getEntryById
+          ? (window as any).HistoryManager.getEntryById(entryId, uid)
+          : null;
+        if (entry) {
+          // 실제 공유 링크 생성
+          shareUrl = require('../utils/historyManager').HistoryManager.generateShareLink(entry);
+        } else {
+          // 직접 생성 (id만으로)
+          shareUrl = window.location.origin + '/share/' + entryId;
+        }
+      }
+      await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch (e) {
