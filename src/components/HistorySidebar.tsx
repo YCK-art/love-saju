@@ -141,7 +141,7 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({ isOpen, onToggle, onLoa
         <button
           onClick={onToggle}
           style={{
-            position: 'fixed', top: '1.2rem', left: '1.2rem', zIndex: 101,
+            position: 'fixed', top: '4.5rem', left: '1.2rem', zIndex: 3500,
             background: 'white', borderRadius: '50%', boxShadow: '0 4px 12px rgba(236,72,153,0.15)', border: 'none', padding: '0.9rem', cursor: 'pointer',
           }}
         >

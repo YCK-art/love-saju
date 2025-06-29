@@ -33,6 +33,9 @@ const Header: React.FC<HeaderProps> = ({ user, onUserChange }) => {
     }
   };
 
+  // 모바일 감지
+  const isMobile = window.innerWidth < 700;
+
   return (
     <header style={{
       position: 'fixed',
@@ -109,12 +112,12 @@ const Header: React.FC<HeaderProps> = ({ user, onUserChange }) => {
           onClick={handleLogin}
           disabled={isLoading}
           style={{
-            padding: '0.75rem 1.5rem',
+            padding: isMobile ? '0.55rem 1rem' : '0.75rem 1.5rem',
             background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
             border: 'none',
             borderRadius: '2rem',
             color: 'white',
-            fontSize: '0.95rem',
+            fontSize: isMobile ? '0.85rem' : '0.95rem',
             fontWeight: 600,
             cursor: isLoading ? 'not-allowed' : 'pointer',
             opacity: isLoading ? 0.6 : 1,
@@ -122,14 +125,14 @@ const Header: React.FC<HeaderProps> = ({ user, onUserChange }) => {
             boxShadow: '0 4px 12px rgba(236, 72, 153, 0.2)',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem',
+            gap: isMobile ? '0.3rem' : '0.5rem',
           }}
         >
           {isLoading ? (
             <>
               <div style={{
-                width: '1rem',
-                height: '1rem',
+                width: isMobile ? '0.8rem' : '1rem',
+                height: isMobile ? '0.8rem' : '1rem',
                 border: '2px solid rgba(255,255,255,0.3)',
                 borderTop: '2px solid white',
                 borderRadius: '50%',
@@ -139,7 +142,7 @@ const Header: React.FC<HeaderProps> = ({ user, onUserChange }) => {
             </>
           ) : (
             <>
-              <span style={{ fontSize: '1.1rem' }}>🔐</span>
+              <span style={{ fontSize: isMobile ? '0.95rem' : '1.1rem' }}>🔐</span>
               Google로 로그인
             </>
           )}
