@@ -11,7 +11,7 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading }) => {
   
   const [userInfo, setUserInfo] = useState<PersonInfo>({
     name: '',
-    gender: '남자',
+    gender: '여자',
     birthDate: defaultDate,
     birthTime: ''
   });

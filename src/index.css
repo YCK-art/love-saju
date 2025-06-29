@@ -126,11 +126,13 @@ body {
 .form-select {
   width: 100%;
   padding: 0.75rem 1rem;
+  padding-right: 2.5rem;
   border: 1px solid #d1d5db;
   border-radius: 0.75rem;
   font-size: 1rem;
   background-color: white;
   transition: all 0.3s ease;
+  background-position: right 2rem center;
 }
 
 .form-select:focus {
