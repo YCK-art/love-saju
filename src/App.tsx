@@ -42,6 +42,17 @@ function App() {
     return unsubscribe;
   }, []);
 
+  // 로그아웃 시 입력화면으로 이동
+  useEffect(() => {
+    if (!authUser) {
+      setCurrentStep('input');
+      setUserInfo(null);
+      setCrushInfo(null);
+      setResult(null);
+      setAnalysis(null);
+    }
+  }, [authUser]);
+
   // 모바일 감지
   useEffect(() => {
     const handleResize = () => {
@@ -56,6 +67,16 @@ function App() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    const shown = localStorage.getItem('introShown');
+    if (shown) setShowStart(false);
+  }, []);
+
+  const handleCloseIntro = () => {
+    setShowStart(false);
+    localStorage.setItem('introShown', 'true');
+  };
 
   const handleStartReading = (user: PersonInfo, crush: PersonInfo) => {
     setUserInfo(user);
@@ -79,8 +100,8 @@ function App() {
       setAnalysis(compatibilityAnalysis);
       setCurrentStep('result');
 
-      // 히스토리에 저장
-      HistoryManager.saveToHistory(user, crush, newResult, compatibilityAnalysis);
+      // 히스토리에 저장 (uid)
+      HistoryManager.saveToHistory(user, crush, newResult, compatibilityAnalysis, authUser?.uid);
       
       // 히스토리 사이드바 강제 새로고침
       setHistoryKey(prev => prev + 1);
@@ -116,7 +137,7 @@ function App() {
       <Header user={authUser} onUserChange={setAuthUser} />
 
       {/* 인트로 화면 */}
-      {showStart && <StartScreen onStart={() => setShowStart(false)} />}
+      {showStart && <StartScreen onStart={handleCloseIntro} />}
 
       {/* 히스토리 사이드바 */}
       <HistorySidebar
@@ -124,6 +145,7 @@ function App() {
         isOpen={isHistoryOpen}
         onToggle={() => setIsHistoryOpen(!isHistoryOpen)}
         onLoadHistory={handleLoadHistory}
+        uid={authUser?.uid}
       />
 
       {/* 메인 콘텐츠 */}

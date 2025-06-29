@@ -5,28 +5,29 @@ interface HistorySidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   onLoadHistory: (entry: HistoryEntry) => void;
+  uid?: string;
 }
 
-const HistorySidebar: React.FC<HistorySidebarProps> = ({ isOpen, onToggle, onLoadHistory }) => {
+const HistorySidebar: React.FC<HistorySidebarProps> = ({ isOpen, onToggle, onLoadHistory, uid }) => {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    setHistory(HistoryManager.getHistory());
+    setHistory(HistoryManager.getHistory(uid));
     const handleResize = () => setIsMobile(window.innerWidth < 700);
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isOpen]);
+  }, [isOpen, uid]);
 
   const handleClearHistory = () => {
-    HistoryManager.clearHistory();
+    HistoryManager.clearHistory(uid);
     setHistory([]);
   };
 
   const handleDeleteEntry = (id: string) => {
-    HistoryManager.removeEntry(id);
-    setHistory(HistoryManager.getHistory());
+    HistoryManager.removeEntry(id, uid);
+    setHistory(HistoryManager.getHistory(uid));
   };
 
   const formatEntryTitle = (entry: HistoryEntry): string => {
@@ -141,11 +142,29 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({ isOpen, onToggle, onLoa
         <button
           onClick={onToggle}
           style={{
-            position: 'fixed', top: '1.2rem', left: '1.2rem', zIndex: 3500,
-            background: 'white', borderRadius: '50%', boxShadow: '0 4px 12px rgba(236,72,153,0.15)', border: 'none', padding: '0.9rem', cursor: 'pointer',
+            position: 'fixed',
+            top: '0.7rem',
+            left: '1.2rem',
+            zIndex: 3500,
+            background: 'linear-gradient(135deg, #fbc2eb 0%, #f9a8d4 100%)',
+            border: 'none',
+            borderTopLeftRadius: '1.2rem',
+            borderTopRightRadius: '1.2rem',
+            borderBottomLeftRadius: '0.5rem',
+            borderBottomRightRadius: '0.5rem',
+            boxShadow: '0 4px 16px rgba(236,72,153,0.18)',
+            padding: '0.7rem 1.1rem 1.1rem 1.1rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minWidth: '2.7rem',
+            minHeight: '2.7rem',
+            outline: 'none',
+            transition: 'box-shadow 0.2s',
           }}
         >
-          <span style={{ fontSize: '1.5rem', color: '#ec4899' }}>☰</span>
+          <span style={{ fontSize: '1.5rem', color: '#ec4899', fontWeight: 700, letterSpacing: '0.1em' }}>☰</span>
         </button>
       )}
     </>

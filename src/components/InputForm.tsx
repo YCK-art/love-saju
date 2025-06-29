@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PersonInfo } from '../App';
 
 interface InputFormProps {
@@ -8,6 +8,7 @@ interface InputFormProps {
 const InputForm: React.FC<InputFormProps> = ({ onStartReading }) => {
   // 2000년을 기본값으로 설정
   const defaultDate = '2000-01-01';
+  const LOCAL_KEY = 'my_profile';
   
   const [userInfo, setUserInfo] = useState<PersonInfo>({
     name: '',
@@ -22,6 +23,29 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading }) => {
     birthDate: defaultDate,
     birthTime: ''
   });
+
+  // 내 정보 자동 입력 (localStorage)
+  useEffect(() => {
+    const saved = localStorage.getItem(LOCAL_KEY);
+    if (saved) {
+      const profile = JSON.parse(saved);
+      setUserInfo({
+        name: profile.name || '',
+        gender: profile.gender || '여자',
+        birthDate: profile.birthDate || defaultDate,
+        birthTime: profile.birthTime || ''
+      });
+    }
+  }, []);
+
+  // 내 정보 성별에 따라 상대방 성별 자동 설정
+  useEffect(() => {
+    setCrushInfo(prev => ({
+      ...prev,
+      gender: userInfo.gender === '남자' ? '여자' : '남자'
+    }));
+    // eslint-disable-next-line
+  }, [userInfo.gender]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

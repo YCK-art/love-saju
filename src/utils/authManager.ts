@@ -16,6 +16,7 @@ export interface AuthUser {
 // Google 로그인
 export const signInWithGoogle = async (): Promise<AuthUser | null> => {
   try {
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
     
