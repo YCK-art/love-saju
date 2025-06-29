@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SajuResult, PersonInfo } from '../App';
 import { CompatibilityAnalysis } from '../utils/sajuCalculator';
 
@@ -16,6 +16,18 @@ const Result: React.FC<ResultProps> = ({ result, userInfo, crushInfo, analysis, 
     if (score >= 85) return '#ec4899'; // 진한 핑크
     if (score >= 70) return '#a78bfa'; // 연보라
     return '#fbbf24'; // 노랑
+  };
+
+  // 링크 복사 상태
+  const [copied, setCopied] = useState(false);
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (e) {
+      alert('링크 복사에 실패했습니다.');
+    }
   };
 
   return (
@@ -105,6 +117,39 @@ const Result: React.FC<ResultProps> = ({ result, userInfo, crushInfo, analysis, 
       <button onClick={onRestart} className="btn btn-secondary">
         🔄 다시 해보기
       </button>
+
+      {/* 공유(링크 복사) 버튼 */}
+      <div style={{ textAlign: 'center', marginTop: '-0.5rem', marginBottom: '0.5rem' }}>
+        <button
+          onClick={handleCopyLink}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: '1.6rem',
+            color: '#8b5cf6',
+            transition: 'color 0.2s',
+            outline: 'none',
+            margin: 0,
+            padding: 0,
+          }}
+          title="결과 링크 복사"
+        >
+          🔗
+        </button>
+        {copied && (
+          <span style={{
+            marginLeft: '0.7rem',
+            fontSize: '1rem',
+            color: '#ec4899',
+            fontWeight: 600,
+            verticalAlign: 'middle',
+            transition: 'opacity 0.3s',
+          }}>
+            링크가 복사되었습니다!
+          </span>
+        )}
+      </div>
 
       {/* 하단 안내 */}
       <div style={{ textAlign: 'center', fontSize: '0.85rem', color: '#bdbdbd', marginTop: '1.5rem' }}>

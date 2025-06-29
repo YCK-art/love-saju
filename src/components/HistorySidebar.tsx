@@ -42,7 +42,7 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({ isOpen, onToggle, onLoa
     width: isMobile ? '80vw' : '320px',
     background: 'linear-gradient(135deg, #ffe5f1 0%, #f3e5f5 100%)',
     boxShadow: '4px 0 24px rgba(236,72,153,0.08)',
-    zIndex: 100,
+    zIndex: 1100,
     transform: isMobile && !isOpen ? 'translateX(-100%)' : 'translateX(0)',
     transition: 'transform 0.3s cubic-bezier(.4,0,.2,1)',
     display: 'flex',

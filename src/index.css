@@ -416,14 +416,27 @@ body {
 }
 
 /* 반응형 */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .container {
-    padding: 1rem 0.5rem;
+    padding: 1rem;
+  }
+  
+  .card {
+    padding: 1rem;
+  }
+  
+  .btn {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.95rem;
   }
   
   .sidebar {
     width: 80vw;
-    border-top-right-radius: 2rem;
-    border-bottom-right-radius: 2rem;
   }
+}
+
+/* Header 로딩 스피너 애니메이션 */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

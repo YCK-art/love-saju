@@ -4,8 +4,10 @@ import Loading from './components/Loading';
 import Result from './components/Result';
 import HistorySidebar from './components/HistorySidebar';
 import StartScreen from './components/StartScreen';
+import Header from './components/Header';
 import { calculateSaju, analyzeCompatibility, CompatibilityAnalysis } from './utils/sajuCalculator';
 import { HistoryManager, HistoryEntry } from './utils/historyManager';
+import { AuthUser, onAuthStateChange } from './utils/authManager';
 
 export interface PersonInfo {
   name: string;
@@ -30,6 +32,15 @@ function App() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [historyKey, setHistoryKey] = useState(0); // 히스토리 강제 리렌더링용
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null); // 인증된 사용자
+
+  // 인증 상태 감지
+  useEffect(() => {
+    const unsubscribe = onAuthStateChange((user) => {
+      setAuthUser(user);
+    });
+    return unsubscribe;
+  }, []);
 
   // 모바일 감지
   useEffect(() => {
@@ -101,6 +112,9 @@ function App() {
       background: 'linear-gradient(135deg, #ffe5f1 0%, #f3e5f5 50%, #e9d5ff 100%)',
       fontFamily: 'Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", Arial, sans-serif'
     }}>
+      {/* Header (로그인/회원가입 버튼) */}
+      <Header user={authUser} onUserChange={setAuthUser} />
+
       {/* 인트로 화면 */}
       {showStart && <StartScreen onStart={() => setShowStart(false)} />}
 
@@ -116,6 +130,7 @@ function App() {
       <div style={{
         marginLeft: isMobile ? 0 : '320px',
         padding: '2rem 1rem',
+        paddingTop: '5rem', // Header 높이만큼 여백 추가
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
