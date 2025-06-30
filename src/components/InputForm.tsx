@@ -86,10 +86,20 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser }) => {
     display: 'flex',
     flexDirection: 'column' as const,
     justifyContent: 'center' as const,
+    paddingTop: isMobile ? 80 : 120, // PC도 충분히 아래로 내림
+    paddingBottom: isMobile ? 40 : 0,
   };
   const cardAndButtonStyle = {
-    width: isMobile ? '66vw' : '100%', // 1.5배 줄임 (100vw/1.5 ≈ 66vw)
+    width: isMobile ? '66vw' : '100%',
     margin: isMobile ? '0 auto' : undefined
+  };
+  const cardStyle = {
+    ...cardAndButtonStyle,
+    marginBottom: isMobile ? 32 : 24, // 카드(입력란) 사이 여유 간격
+  };
+  const buttonStyle = {
+    ...cardAndButtonStyle,
+    marginTop: isMobile ? 32 : 24, // 버튼과 입력란 사이 여유 간격
   };
 
   return (
@@ -107,7 +117,7 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser }) => {
 
       <form onSubmit={handleSubmit} className="space-y-6" style={cardAndButtonStyle}>
         {/* 내 정보 */}
-        <div className="card" style={cardAndButtonStyle}>
+        <div className="card" style={cardStyle}>
           <div className="card-header">
             <span className="icon">👤</span>
             내 정보
@@ -162,7 +172,7 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser }) => {
         </div>
 
         {/* 상대방 정보 */}
-        <div className="card" style={cardAndButtonStyle}>
+        <div className="card" style={cardStyle}>
           <div className="card-header">
             <span className="icon">💝</span>
             상대방 정보
@@ -217,7 +227,7 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser }) => {
         </div>
 
         {/* 제출 버튼 */}
-        <button type="submit" className="btn btn-primary" style={cardAndButtonStyle}>
+        <button type="submit" className="btn btn-primary" style={buttonStyle}>
           🔮 사주풀이 시작하기
         </button>
       </form>
