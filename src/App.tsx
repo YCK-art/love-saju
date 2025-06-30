@@ -15,6 +15,7 @@ import {
   useParams,
   Navigate
 } from 'react-router-dom';
+import AuthLoading from './components/AuthLoading';
 
 export interface PersonInfo {
   name: string;
@@ -59,11 +60,13 @@ function App() {
   const [historyKey, setHistoryKey] = useState(0); // 히스토리 강제 리렌더링용
   const [authUser, setAuthUser] = useState<AuthUser | null>(null); // 인증된 사용자
   const [currentResultId, setCurrentResultId] = useState<string | null>(null);
+  const [isAuthReady, setIsAuthReady] = useState(false); // 인증 상태 준비 여부
 
   // 인증 상태 감지
   useEffect(() => {
     const unsubscribe = onAuthStateChange((user) => {
       setAuthUser(user);
+      setIsAuthReady(true);
     });
     return unsubscribe;
   }, []);
@@ -163,37 +166,45 @@ function App() {
         background: 'linear-gradient(135deg, #ffe5f1 0%, #f3e5f5 50%, #e9d5ff 100%)',
         fontFamily: 'Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", Arial, sans-serif'
       }}>
-        <Header user={authUser} onUserChange={setAuthUser} />
-        {showStart && <StartScreen onStart={handleCloseIntro} />}
-        <HistorySidebar
-          key={historyKey}
-          isOpen={isHistoryOpen}
-          onToggle={() => setIsHistoryOpen(!isHistoryOpen)}
-          onLoadHistory={handleLoadHistory}
-          uid={authUser?.uid}
-        />
-        <main style={{ marginLeft: isMobile ? 0 : 320, transition: 'margin 0.3s', minHeight: '100vh' }}>
-          <Routes>
-            <Route path="/share/:id" element={<SharedResult />} />
-            <Route path="/*" element={
-              <>
-                {currentStep === 'input' && <InputForm onStartReading={handleStartReading} authUser={authUser} />}
-                {currentStep === 'loading' && <Loading />}
-                {currentStep === 'result' && result && analysis && userInfo && crushInfo && (
-                  <Result 
-                    result={result} 
-                    userInfo={userInfo} 
-                    crushInfo={crushInfo}
-                    analysis={analysis}
-                    onRestart={handleRestart}
-                    entryId={currentResultId}
-                    uid={authUser?.uid}
-                  />
-                )}
-              </>
-            } />
-          </Routes>
-        </main>
+        {!isAuthReady ? (
+          <div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh'}}>
+            <AuthLoading />
+          </div>
+        ) : (
+          <>
+            <Header user={authUser} onUserChange={setAuthUser} />
+            {showStart && <StartScreen onStart={handleCloseIntro} />}
+            <HistorySidebar
+              key={historyKey}
+              isOpen={isHistoryOpen}
+              onToggle={() => setIsHistoryOpen(!isHistoryOpen)}
+              onLoadHistory={handleLoadHistory}
+              uid={authUser?.uid}
+            />
+            <main style={{ marginLeft: isMobile ? 0 : 320, transition: 'margin 0.3s', minHeight: '100vh' }}>
+              <Routes>
+                <Route path="/share/:id" element={<SharedResult />} />
+                <Route path="/*" element={
+                  <>
+                    {currentStep === 'input' && <InputForm onStartReading={handleStartReading} authUser={authUser} />}
+                    {currentStep === 'loading' && <Loading />}
+                    {currentStep === 'result' && result && analysis && userInfo && crushInfo && (
+                      <Result 
+                        result={result} 
+                        userInfo={userInfo} 
+                        crushInfo={crushInfo}
+                        analysis={analysis}
+                        onRestart={handleRestart}
+                        entryId={currentResultId}
+                        uid={authUser?.uid}
+                      />
+                    )}
+                  </>
+                } />
+              </Routes>
+            </main>
+          </>
+        )}
       </div>
     </Router>
   );
