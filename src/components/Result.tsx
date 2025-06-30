@@ -12,7 +12,20 @@ interface ResultProps {
   uid?: string;
 }
 
-const Result: React.FC<ResultProps> = ({ result, userInfo, crushInfo, analysis, onRestart, entryId, uid }) => {
+const Result: React.FC<ResultProps> = ({ result, userInfo, crushInfo, analysis, onRestart }) => {
+  const isMobile = window.innerWidth <= 700;
+  const resultContainerStyle = {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '2rem',
+    maxWidth: isMobile ? '90vw' : '33vw',
+    width: isMobile ? '66vw' : undefined,
+    minWidth: 320,
+    margin: isMobile ? '100px auto 0 auto' : '120px auto 0 auto',
+    paddingTop: isMobile ? 60 : 40,
+    alignItems: 'center' as const,
+  };
+
   // 점수에 따라 컬러 결정
   const getScoreColor = (score: number) => {
     if (score >= 85) return '#ec4899'; // 진한 핑크
@@ -20,34 +33,8 @@ const Result: React.FC<ResultProps> = ({ result, userInfo, crushInfo, analysis, 
     return '#fbbf24'; // 노랑
   };
 
-  // 링크 복사 상태
-  const [copied, setCopied] = useState(false);
-  const handleCopyLink = async () => {
-    try {
-      let shareUrl = window.location.href;
-      if (entryId) {
-        // 공유 링크 생성
-        const entry = (window as any).HistoryManager?.getEntryById
-          ? (window as any).HistoryManager.getEntryById(entryId, uid)
-          : null;
-        if (entry) {
-          // 실제 공유 링크 생성
-          shareUrl = require('../utils/historyManager').HistoryManager.generateShareLink(entry);
-        } else {
-          // 직접 생성 (id만으로)
-          shareUrl = window.location.origin + '/share/' + entryId;
-        }
-      }
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch (e) {
-      alert('링크 복사에 실패했습니다.');
-    }
-  };
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div style={resultContainerStyle}>
       {/* 상단 카드 */}
       <div style={{
         background: 'linear-gradient(135deg, #ffe5f1 0%, #f3e5f5 100%)',
@@ -57,6 +44,7 @@ const Result: React.FC<ResultProps> = ({ result, userInfo, crushInfo, analysis, 
         textAlign: 'center',
         position: 'relative',
         marginBottom: '1.5rem',
+        width: '100%',
       }}>
         <div style={{ position: 'absolute', top: 24, left: 24, fontSize: '2rem' }}>🔮</div>
         <div style={{ fontSize: '1.25rem', color: '#ec4899', fontWeight: 700, marginBottom: '0.5rem' }}>
@@ -105,6 +93,7 @@ const Result: React.FC<ResultProps> = ({ result, userInfo, crushInfo, analysis, 
         boxShadow: '0 4px 16px rgba(167,139,250,0.08)',
         padding: '2rem 1.5rem',
         marginBottom: '1.5rem',
+        width: '100%',
       }}>
         <div style={{ fontWeight: 700, color: '#8b5cf6', marginBottom: '0.75rem', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span style={{ fontSize: '1.3rem' }}>📖</span> 상세 사주 해석
@@ -124,48 +113,16 @@ const Result: React.FC<ResultProps> = ({ result, userInfo, crushInfo, analysis, 
         display: 'flex',
         alignItems: 'center',
         gap: '1rem',
+        width: '100%',
       }}>
         <span style={{ fontSize: '1.5rem', color: '#fbbf24' }}>💡</span>
         <div style={{ color: '#a16207', fontWeight: 500, fontSize: '1rem' }}>{analysis.relationshipAdvice}</div>
       </div>
 
       {/* 다시 시작하기 버튼 */}
-      <button onClick={onRestart} className="btn btn-secondary">
+      <button onClick={onRestart} className="btn btn-secondary" style={{width: '100%'}}>
         🔄 다시 해보기
       </button>
-
-      {/* 공유(링크 복사) 버튼 */}
-      <div style={{ textAlign: 'center', marginTop: '-0.5rem', marginBottom: '0.5rem' }}>
-        <button
-          onClick={handleCopyLink}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: '1.6rem',
-            color: '#8b5cf6',
-            transition: 'color 0.2s',
-            outline: 'none',
-            margin: 0,
-            padding: 0,
-          }}
-          title="결과 링크 복사"
-        >
-          🔗
-        </button>
-        {copied && (
-          <span style={{
-            marginLeft: '0.7rem',
-            fontSize: '1rem',
-            color: '#ec4899',
-            fontWeight: 600,
-            verticalAlign: 'middle',
-            transition: 'opacity 0.3s',
-          }}>
-            링크가 복사되었습니다!
-          </span>
-        )}
-      </div>
 
       {/* 하단 안내 */}
       <div style={{ textAlign: 'center', fontSize: '0.85rem', color: '#bdbdbd', marginTop: '1.5rem' }}>

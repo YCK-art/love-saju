@@ -12,9 +12,17 @@ const Loading: React.FC = () => {
   }, []);
 
   return (
-    <div className="loading-container">
+    <div className="loading-container" style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minHeight:'60vh'}}>
       {/* 로딩 애니메이션 */}
-      <div className="loading-spinner"></div>
+      <div className="loading-spinner" style={{
+        width: '3rem',
+        height: '3rem',
+        border: '6px solid #f3e5f5',
+        borderTop: '6px solid #ec4899',
+        borderRadius: '50%',
+        animation: 'spin 1s linear infinite',
+        margin: '0 auto',
+      }} />
 
       {/* 메시지 */}
       <div style={{ textAlign: 'center', marginTop: '2rem' }}>
@@ -41,11 +49,26 @@ const Loading: React.FC = () => {
       </div>
 
       {/* 하단 장식 */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '2rem' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '2rem', justifyContent:'center' }}>
         <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: '#fce7f3', borderRadius: '50%', animation: 'bounce 1s infinite' }}></div>
         <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: '#f3e8ff', borderRadius: '50%', animation: 'bounce 1s infinite', animationDelay: '0.1s' }}></div>
         <div style={{ width: '0.5rem', height: '0.5rem', backgroundColor: '#fce7f3', borderRadius: '50%', animation: 'bounce 1s infinite', animationDelay: '0.2s' }}></div>
       </div>
+
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `}</style>
     </div>
   );
 };
