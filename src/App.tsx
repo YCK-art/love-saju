@@ -159,6 +159,11 @@ function App() {
     }
   };
 
+  // 내 정보 저장 시 InputForm에 즉시 반영
+  const handleProfileSave = (profile: PersonInfo) => {
+    setUserInfo(profile);
+  };
+
   return (
     <Router>
       <div style={{ 
@@ -172,7 +177,7 @@ function App() {
           </div>
         ) : (
           <>
-            <Header user={authUser} onUserChange={setAuthUser} />
+            <Header user={authUser} onUserChange={setAuthUser} onProfileSave={handleProfileSave} />
             {showStart && <StartScreen onStart={handleCloseIntro} />}
             <HistorySidebar
               key={historyKey}
@@ -186,7 +191,7 @@ function App() {
                 <Route path="/share/:id" element={<SharedResult />} />
                 <Route path="/*" element={
                   <>
-                    {currentStep === 'input' && <InputForm onStartReading={handleStartReading} authUser={authUser} />}
+                    {currentStep === 'input' && <InputForm onStartReading={handleStartReading} authUser={authUser} userInfoOverride={userInfo} />}
                     {currentStep === 'loading' && <Loading />}
                     {currentStep === 'result' && result && analysis && userInfo && crushInfo && (
                       <Result 

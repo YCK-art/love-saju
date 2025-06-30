@@ -4,9 +4,10 @@ import { PersonInfo } from '../App';
 interface InputFormProps {
   onStartReading: (user: PersonInfo, crush: PersonInfo) => void;
   authUser?: { uid: string } | null;
+  userInfoOverride?: PersonInfo | null;
 }
 
-const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser }) => {
+const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser, userInfoOverride }) => {
   // 2000년을 기본값으로 설정
   const defaultDate = '2000-01-01';
   const LOCAL_KEY = 'my_profile';
@@ -60,6 +61,13 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser }) => {
     // eslint-disable-next-line
   }, [userInfo.gender]);
 
+  // userInfoOverride가 바뀌면 즉시 반영
+  useEffect(() => {
+    if (userInfoOverride) {
+      setUserInfo(userInfoOverride);
+    }
+  }, [userInfoOverride]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (userInfo.name && userInfo.birthDate && crushInfo.name && crushInfo.birthDate) {
@@ -77,6 +85,8 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser }) => {
 
   // 반응형: 모바일에서 가로폭 줄이기
   const isMobile = window.innerWidth <= 700;
+  const titleFontSize = isMobile ? '1.3rem' : '1.875rem';
+  const subtitleMarginBottom = isMobile ? '1.2rem' : '0.5rem';
   const containerStyle = {
     maxWidth: isMobile ? '90vw' : '25vw',
     minWidth:  isMobile ? 0 : 320,
@@ -109,10 +119,10 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser }) => {
     >
       {/* 헤더 */}
       <div className="text-center">
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.5rem' }}>
-          💕 연애 사주풀이
+        <h1 style={{ fontSize: titleFontSize, fontWeight: 'bold', color: '#1f2937', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+          <span role="img" aria-label="love">💕</span> 연애 사주풀이
         </h1>
-        <p style={{ color: '#6b7280' }}>당신과 그 사람의 운명을 알아보세요</p>
+        <p style={{ color: '#6b7280', marginBottom: subtitleMarginBottom }}>당신과 그 사람의 운명을 알아보세요</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6" style={cardAndButtonStyle}>

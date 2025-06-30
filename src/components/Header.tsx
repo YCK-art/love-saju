@@ -4,6 +4,7 @@ import { AuthUser, signInWithGoogle, signOutUser } from '../utils/authManager';
 interface HeaderProps {
   user: AuthUser | null;
   onUserChange: (user: AuthUser | null) => void;
+  onProfileSave?: (profile: MyProfile) => void;
 }
 
 // 내 정보 타입
@@ -23,7 +24,7 @@ const defaultProfile: MyProfile = {
 
 const LOCAL_KEY = 'my_profile';
 
-const Header: React.FC<HeaderProps> = ({ user, onUserChange }) => {
+const Header: React.FC<HeaderProps> = ({ user, onUserChange, onProfileSave }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -116,6 +117,9 @@ const Header: React.FC<HeaderProps> = ({ user, onUserChange }) => {
     const profileKey = user?.uid ? `${LOCAL_KEY}_${user.uid}` : LOCAL_KEY;
     localStorage.setItem(profileKey, JSON.stringify(profile));
     setShowProfileModal(false);
+    if (typeof onProfileSave === 'function') {
+      onProfileSave(profile);
+    }
   };
 
   return (
