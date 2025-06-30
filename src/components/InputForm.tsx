@@ -75,8 +75,28 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser }) => {
     setCrushInfo(prev => ({ ...prev, [field]: value }));
   };
 
+  // 반응형: 모바일에서 가로폭 줄이기
+  const isMobile = window.innerWidth <= 700;
+  const containerStyle = {
+    maxWidth: isMobile ? '90vw' : '25vw',
+    minWidth:  isMobile ? 0 : 320,
+    width: isMobile ? '90vw' : undefined,
+    margin: '0 auto',
+    minHeight: 'calc(100vh - 120px)',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    justifyContent: 'center' as const,
+  };
+  const cardAndButtonStyle = {
+    width: isMobile ? '66vw' : '100%', // 1.5배 줄임 (100vw/1.5 ≈ 66vw)
+    margin: isMobile ? '0 auto' : undefined
+  };
+
   return (
-    <div className="space-y-6">
+    <div
+      style={containerStyle}
+      className="space-y-6"
+    >
       {/* 헤더 */}
       <div className="text-center">
         <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.5rem' }}>
@@ -85,9 +105,9 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser }) => {
         <p style={{ color: '#6b7280' }}>당신과 그 사람의 운명을 알아보세요</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" style={cardAndButtonStyle}>
         {/* 내 정보 */}
-        <div className="card">
+        <div className="card" style={cardAndButtonStyle}>
           <div className="card-header">
             <span className="icon">👤</span>
             내 정보
@@ -142,7 +162,7 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser }) => {
         </div>
 
         {/* 상대방 정보 */}
-        <div className="card">
+        <div className="card" style={cardAndButtonStyle}>
           <div className="card-header">
             <span className="icon">💝</span>
             상대방 정보
@@ -197,7 +217,7 @@ const InputForm: React.FC<InputFormProps> = ({ onStartReading, authUser }) => {
         </div>
 
         {/* 제출 버튼 */}
-        <button type="submit" className="btn btn-primary">
+        <button type="submit" className="btn btn-primary" style={cardAndButtonStyle}>
           🔮 사주풀이 시작하기
         </button>
       </form>
